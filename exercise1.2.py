@@ -7,7 +7,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 
 
 BROKER_URL = "PLAINTEXT://localhost:9092"
-TOPIC_NAME = "my-first-python-topic"
+TOPIC_NAME = "topic-exercise-1-2-1"
 
 
 async def produce(topic_name):
@@ -68,14 +68,16 @@ def main():
     """Runs the exercise"""
     # TODO: Configure the AdminClient with `bootstrap.servers`
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient
-    # client = AdminClient(...)
+
+    client = AdminClient({"bootstrap.servers": BROKER_URL})
+
     # TODO: Create a NewTopic object. Don't forget to set partitions and replication factor to 1!
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.NewTopic
-    # topic = NewTopic(...)
+    topic = NewTopic(TOPIC_NAME, 1, 1)
 
     # TODO: Using `client`, create the topic
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient.create_topics
-    # client.create_topics(...)
+    client.create_topics([topic])
 
     try:
         asyncio.run(produce_consume())
@@ -85,6 +87,8 @@ def main():
         # TODO: Using `client`, delete the topic
         #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient.delete_topics
         # client.delete_topics(...)
+        client.delete_topics([TOPIC_NAME])
+
         pass
 
 
