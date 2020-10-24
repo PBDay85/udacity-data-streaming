@@ -1,6 +1,6 @@
 # Please complete the TODO items in the code.
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field  # SHARE-WITH-TEAM
 import json
 import random
 
@@ -23,9 +23,15 @@ class Purchase:
 
     def serialize(self):
         """Serializes the object in JSON string format"""
-        # TODO: Serializer the Purchase object
+        # Serializer the Purchase object
         #       See: https://docs.python.org/3/library/json.html#json.dumps
-        return ""
+        return json.dumps(
+            {
+                "username": self.username,
+                "currency": self.currency,
+                "amount": self.amount,
+            }
+        )
 
 
 def produce_sync(topic_name):
@@ -35,9 +41,11 @@ def produce_sync(topic_name):
     # TODO: Write a synchronous production loop.
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Producer.flush
     while True:
+
         # TODO: Instantiate a `Purchase` on every iteration. Make sure to serialize it before
         #       sending it to Kafka!
-        # p.produce(topic_name, ...)
+        p.produce(topic_name, Purchase().serialize())
+        p.flush()
         pass
 
 
