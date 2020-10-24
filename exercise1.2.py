@@ -14,13 +14,13 @@ async def produce(topic_name):
     """Produces data into the Kafka Topic"""
     # TODO: Configure the producer with `bootstrap.servers`
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#producer
-    # p = Producer(...)
+    p = Producer({"bootstrap.servers": BROKER_URL})
 
     curr_iteration = 0
     while True:
         # TODO: Produce a message to the topic
         #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Producer.produce
-        # p.produce(...)
+        p.produce(TOPIC_NAME, f"Message number {curr_iteration}")
 
         curr_iteration += 1
         await asyncio.sleep(1)
@@ -28,18 +28,20 @@ async def produce(topic_name):
 
 async def consume(topic_name):
     """Consumes data from the Kafka Topic"""
-    # TODO: Configure the consumer with `bootstrap.servers` and `group.id`
+    # Configure the consumer with `bootstrap.servers` and `group.id`
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#consumer
-    # c = Consumer(...)
+    c = Consumer({"bootstrap.servers": BROKER_URL, "group.id": "exercise 1.2 group"})
+
+    print(TOPIC_NAME)
 
     # TODO: Subscribe to the topic
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Consumer.subscribe
-    # c.subscribe(...)
+    c.subscribe([TOPIC_NAME])
 
     while True:
         # TODO: Poll for a message
         #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Consumer.poll
-        # message = ???
+        message = c.poll(1.0)
 
         # TODO: Handle the message. Remember that you should:
         #   1. Check if the message is `None`
@@ -48,10 +50,12 @@ async def consume(topic_name):
         #       Key: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Message.key
         #       Value: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.Message.value
         #
-        # if
-        # elif
-        # else
-        #
+        if message is None:
+            print("Message is None")
+        elif message.error():
+            print(f"Error received: {message.error()}")
+        else:
+            print(f"{message.key()}: {message.value()}")
 
         await asyncio.sleep(1)
 
@@ -66,16 +70,16 @@ async def produce_consume():
 
 def main():
     """Runs the exercise"""
-    # TODO: Configure the AdminClient with `bootstrap.servers`
+    # Configure the AdminClient with `bootstrap.servers`
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient
 
     client = AdminClient({"bootstrap.servers": BROKER_URL})
 
-    # TODO: Create a NewTopic object. Don't forget to set partitions and replication factor to 1!
+    # Create a NewTopic object. Don't forget to set partitions and replication factor to 1!
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.NewTopic
     topic = NewTopic(TOPIC_NAME, 1, 1)
 
-    # TODO: Using `client`, create the topic
+    # Using `client`, create the topic
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient.create_topics
     client.create_topics([topic])
 
@@ -84,7 +88,7 @@ def main():
     except KeyboardInterrupt as e:
         print("shutting down")
     finally:
-        # TODO: Using `client`, delete the topic
+        # Using `client`, delete the topic
         #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/#confluent_kafka.admin.AdminClient.delete_topics
         # client.delete_topics(...)
         client.delete_topics([TOPIC_NAME])
