@@ -20,7 +20,7 @@ async def consume(topic_name):
         {
             "bootstrap.servers": BROKER_URL,
             "group.id": "0",
-            # TODO
+            "auto.offset.reset": "earliest",
         }
     )
 
@@ -45,7 +45,7 @@ def on_assign(consumer, partitions):
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/index.html?highlight=partition#confluent_kafka.Consumer.on_assign
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/index.html?highlight=partition#confluent_kafka.TopicPartition
     for partition in partitions:
-        pass
+        partition.offset = OFFSET_BEGINNING
 
     # TODO: Assign the consumer the partitions
     #       See: https://docs.confluent.io/current/clients/confluent-kafka-python/index.html?highlight=partition#confluent_kafka.Consumer.assign
