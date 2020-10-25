@@ -29,7 +29,10 @@ def produce(topic_name):
     p = Producer(
         {
             "bootstrap.servers": BROKER_URL,
-            # TODO
+            "client.id": "Producer ID",
+            "batch.num.messages": 100,
+            "linger.ms": 1000,
+            "compression.type": "lz4",
         }
     )
 
